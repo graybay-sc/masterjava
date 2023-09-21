@@ -23,6 +23,16 @@ public class XsltProcessor {
         }
     }
 
+    public XsltProcessor(InputStream xslInputStream, String paramName, String paramValue) {
+        try {
+            Templates template = FACTORY.newTemplates(new StreamSource(new BufferedReader(new InputStreamReader(xslInputStream, StandardCharsets.UTF_8))));
+            xformer = template.newTransformer();
+            xformer.setParameter(paramName, paramValue);
+        } catch (TransformerConfigurationException e) {
+            throw new IllegalStateException("XSLT transformer creation failed: " + e.toString(), e);
+        }
+    }
+
     public String transform(InputStream xmlInputStream) throws TransformerException {
         StringWriter out = new StringWriter();
         transform(xmlInputStream, out);

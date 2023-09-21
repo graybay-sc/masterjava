@@ -1,5 +1,6 @@
 package ru.javaops.masterjava.xml.util;
 
+import com.sun.xml.internal.bind.api.JAXBRIContext;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
@@ -8,6 +9,8 @@ import javax.xml.bind.PropertyException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import java.io.*;
+import java.util.Collections;
+import java.util.Map;
 
 
 /**
@@ -22,7 +25,7 @@ public class JaxbParser {
 
     public JaxbParser(Class... classesToBeBound) {
         try {
-            init(JAXBContext.newInstance(classesToBeBound));
+            init(JAXBContext.newInstance(classesToBeBound, initProperties()));
         } catch (JAXBException e) {
             throw new IllegalArgumentException(e);
         }
@@ -31,10 +34,15 @@ public class JaxbParser {
     //    http://stackoverflow.com/questions/30643802/what-is-jaxbcontext-newinstancestring-contextpath
     public JaxbParser(String context) {
         try {
-            init(JAXBContext.newInstance(context));
+            init(JAXBContext.newInstance(context, JaxbParser.class.getClassLoader(), initProperties()));
         } catch (JAXBException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    private Map<String, String> initProperties() {
+        Map<String, String> props = Collections.singletonMap(JAXBRIContext.DEFAULT_NAMESPACE_REMAP, "http://namespace");
+        return props;
     }
 
     private void init(JAXBContext ctx) throws JAXBException {
